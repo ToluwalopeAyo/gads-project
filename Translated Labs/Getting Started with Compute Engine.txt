@@ -1,0 +1,67 @@
+LAB NAME: Google Cloud Fundamentals: Getting Started with Compute Engine
+
+Objectives
+
+In this lab, you will learn how to perform the following tasks:
+--Create a Compute Engine virtual machine using the Google Cloud Platform (GCP) Console.
+--Create a Compute Engine virtual machine using the gcloud command-line interface.
+--Connect between the two instances.
+
+Task 1: Sign in to the Google Cloud Platform (GCP) Console
+-gcloud auth login <account>
+
+
+Set environment variables
+-gcloud config set project <project id>
+-gcloud config set compute/zone us-central1-a
+-export PROJECT_ID=<project id>
+
+
+Task 2: Create a virtual machine using the GCP Console
+
+-gcloud compute instances create my-vm-1 --zone=us-central1-a  --machine-type=n1-standard-1 --image-project=debian-cloud --image=debian-9-stretch-v20190213 --network=default --tag=http
+-gcloud compute firewall-rules create vm-allow-http --network=default --direction=INGRESS --priority=1000 --action=ALLOW --rules=tcp:80 --source-ranges=0.0.0.0/0 --target-tags=http
+
+
+Task 3: Create a virtual machine using the gcloud command line
+
+Display the list of zones
+-gcloud compute zones list | grep us-central1
+
+Set default zone
+-gcloud config set compute/zone us-central1-b
+
+Create VM instance my-vm-2
+-gcloud compute instances create "my-vm-2" --machine-type "n1-standard-1" --image-project "debian-cloud" --image "debian-9-stretch-v20190213" --subnet "default"
+
+
+
+Task 4: Connect between VM instances
+-gcloud compute ssh my-vm-2 --quiet
+
+Check connectivity
+-ping my-vm-1
+
+Connect to my-vm-1
+-ssh my-vm-1
+
+Install nginx-server
+-sudo apt-get install nginx-light -y
+
+Add a custom message to the homepage of the web
+-sudo nano /var/www/html/index.nginx-debian.html
+-Hi from YOUR_NAME
+
+Confirm that the web server is serving your new page
+-curl http://localhost/
+
+Exit the command prompt on my-vm-1
+-exit
+
+Confirm that my-vm-2 can reach the web server on my-vm-1
+-curl http://my-vm-1/
+
+Delete resources
+-gcloud compute instances delete my-vm-1
+-gcloud compute firewall-rules delete allow-http
+-gcloud compute instances delete my-vm-2
